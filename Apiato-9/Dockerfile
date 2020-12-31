@@ -1,5 +1,7 @@
 FROM php:7.4-fpm-alpine
 
+RUN apk update
+
 # Install dev dependencies
 RUN apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
@@ -52,6 +54,9 @@ RUN docker-php-ext-enable \
     imagick \
     xdebug
 
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo pdo_pgsql pgsql
+
 # Configure php extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install gd
@@ -66,9 +71,7 @@ RUN docker-php-ext-install \
     iconv \
     intl \
     mbstring \
-    pdo \
     pdo_mysql \
-    pdo_pgsql \
     soap \
     pcntl \
     tokenizer \
