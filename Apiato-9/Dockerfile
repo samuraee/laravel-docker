@@ -1,4 +1,4 @@
-FROM php:7.4-alpine
+FROM php:7.4-fpm-alpine
 
 # Install dev dependencies
 RUN apk add --no-cache --virtual .build-deps \
@@ -7,8 +7,7 @@ RUN apk add --no-cache --virtual .build-deps \
     imagemagick-dev \
     libtool \
     libxml2-dev \
-    postgresql-dev \
-    sqlite-dev
+    postgresql-dev
 
 # Install production dependencies
 RUN apk add --no-cache \
@@ -23,6 +22,7 @@ RUN apk add --no-cache \
     imagemagick \
     libc-dev \
     libjpeg-turbo-dev \
+    libmcrypt-dev \
     libpng-dev \
     libzip-dev \
     make \
@@ -30,10 +30,14 @@ RUN apk add --no-cache \
     nodejs \
     nodejs-npm \
     oniguruma-dev \
+    openssl \
     yarn \
     openssh-client \
     postgresql-libs \
     rsync \
+    tzdata \
+    vim \
+    yarn \
     zlib-dev
 
 # Install PECL and PEAR extensions
@@ -49,7 +53,8 @@ RUN docker-php-ext-enable \
     xdebug
 
 # Configure php extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install gd
 
 # Install php extensions
 RUN docker-php-ext-install \
@@ -70,6 +75,13 @@ RUN docker-php-ext-install \
     xml \
     zip
 
+# Set container timezone
+RUN  cp /usr/share/zoneinfo/Asia/Tehran /etc/localtime \
+     && echo "Asia/Tehran" >  /etc/timezone \
+     && echo "Asia/Tehran" >  /etc/TZ
+ENV TZ=Asia/Tehran
+
+
 # Install composer
 ENV COMPOSER_HOME /composer
 ENV PATH ./vendor/bin:/composer/vendor/bin:$PATH
@@ -80,7 +92,7 @@ RUN curl -s https://getcomposer.org/installer | php -- --1 --install-dir=/usr/lo
 RUN composer global require "squizlabs/php_codesniffer=*"
 
 # Cleanup dev dependencies
-RUN apk del -f .build-deps
+RUN apk del -f .build-deps tzdata
 
 # Setup working directory
 WORKDIR /var/www
