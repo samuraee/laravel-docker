@@ -23,6 +23,7 @@ RUN apk add --no-cache \
     imagemagick \
     libc-dev \
     libjpeg-turbo-dev \
+    libmemcached-dev \
     libpng-dev \
     libzip-dev \
     make \
@@ -38,15 +39,17 @@ RUN apk add --no-cache \
 
 # Install PECL and PEAR extensions
 RUN pecl install \
-    redis \
     imagick \
-    xdebug
+    memcached \
+    opcache \
+    redis
 
 # Enable PECL and PEAR extensions
 RUN docker-php-ext-enable \
-    redis \
     imagick \
-    xdebug
+    memcached \
+    opcache \
+    redis
 
 # Configure php extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
@@ -75,9 +78,6 @@ ENV COMPOSER_HOME /composer
 ENV PATH ./vendor/bin:/composer/vendor/bin:$PATH
 ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
-
-# Install PHP_CodeSniffer
-RUN composer global require "squizlabs/php_codesniffer=*"
 
 # Cleanup dev dependencies
 RUN apk del -f .build-deps
