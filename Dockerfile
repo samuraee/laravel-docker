@@ -1,4 +1,6 @@
-FROM php:7.4-alpine
+FROM php:7.4-fpm-alpine
+
+LABEL "maintainer"="Aboozar Ghaffari <aboozar.ghf@gmail.com>"
 
 # Install dev dependencies
 RUN apk add --no-cache --virtual .build-deps \
@@ -66,6 +68,7 @@ RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
     pdo_pgsql \
+    pgsql \
     soap \
     pcntl \
     tokenizer \

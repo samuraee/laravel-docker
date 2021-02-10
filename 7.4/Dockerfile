@@ -1,4 +1,7 @@
-FROM php:7.4-alpine
+FROM php:7.4-fpm-alpine
+
+LABEL Maintainer="Aboozar Ghaffari <aboozar.ghf@gmail.com>" \
+      Description="Base setup for web development with PHP and PostgreSQL."
 
 # Install dev dependencies
 RUN apk add --no-cache --virtual .build-deps \
